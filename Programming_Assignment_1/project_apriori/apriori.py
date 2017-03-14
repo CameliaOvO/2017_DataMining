@@ -1,6 +1,7 @@
 # Data Science Programming Assignment 1 : apriori algorithm
 # author : Seonha Park
 
+
 # TODO : change minsup and filenames raw string to parameter
 minsup_param = 5
 input_file = "../input.txt"
@@ -10,14 +11,13 @@ minsup = minsup_param / 100
 
 # change item_set between list and string {[item_id],[item_id],...[item_id]}
 def list_to_str(item_set):
-    format = "{"
-    for id in item_set:
-        format = format + str(id)
-        format += ","
-    format = format[:-1]
-    format += "}"
-    return format
-
+    brace = "{"
+    for item_id in item_set:
+        brace = brace + str(item_id)
+        brace += ","
+    brace = brace[:-1]
+    brace += "}"
+    return brace
 
 def str_to_list(str_list):
     str_list = str_list[1:-1]
@@ -25,23 +25,26 @@ def str_to_list(str_list):
     return new_list
 
 
-#make subset of itemset
+# make subset of itemset
 def jin_subset(item_set):
     result_set = [[]]
     for x in item_set:
         result_set.extend([y + [x] for y in result_set])
+    # this is empty set
     result_set.pop(0)
+    # this is not proper-subset
     result_set.pop(len(result_set)-1)
-
     return result_set
 
-#return 1 if set1 and set2 is same, return 0 other case
+
+# return 1 if set1 and set2 is same set, return 0 other case
 def set_comp(set1, set2):
     result = 0
     if len(set(set1).difference(set(set2))) == 0:
         if len(set(set2).difference(set(set1))) == 0:
             result = 1
     return result
+
 
 
 # open input data file and store in transaction list
@@ -57,10 +60,6 @@ for input_line in input_data:
     transactions.append(trans_list)
     total_trans += 1
 
-# check input
-# for t in transactions:
-#    print(t)
-# print("total transactions : " + str(total_trans))
 
 # Start apriori algorithm
 cand = []
@@ -70,9 +69,9 @@ freq = []
 # since list cannot be key of dictionary in python3, I changed sorted itemset to string
 cand_1 = {}
 for trans in transactions:
-    for id in trans:
+    for item_id in trans:
         itemset = []
-        itemset.append(id)
+        itemset.append(item_id)
         itemset_key = list_to_str(itemset)
         if itemset_key not in cand_1:
             cand_1[itemset_key] = 1
@@ -87,13 +86,16 @@ for key, value in cand_1.items():
         freq_1[key] = value
 freq.append(freq_1)
 
+
 k = 2
 
 # for(k=2 ; L_k != empty set ; k++)
-while k < total_trans and len(freq[k - 2]) != 0:
-    # make cand_k(C_k) from freq_km(L_k-1) joining itself
+while k <= total_trans and len(freq[k - 2]) != 0:
+    # make cand_k(C_k) from freq_km(L_k-1) joining itself and pruning
     cand_k = {}
     freq_km = freq[k - 2]
+
+    # self-joining step
     joined_fkm = []
     for k1, v1 in freq_km.items():
         for k2, v2 in freq_km.items():
@@ -110,24 +112,23 @@ while k < total_trans and len(freq[k - 2]) != 0:
 
     # pruning step
     # check its subset in freq_km, freq_kmm ...
-    #make each joined_fkm's non-empty subset
+    # make each joined_fkm's non-empty subset
     pruned_fkm = []
     for j_set in joined_fkm:
         subs_fkm = jin_subset(str_to_list(j_set))
+        prune = -1
         for subset in subs_fkm:
             prune = 1
             for fset in freq:
                 for key_fset , val_fset in fset.items():
                     if set_comp(str_to_list(key_fset), subset) == 1:
                         prune = 0
-            if prune:
-#                print("I should be pruned and I am "+ list_to_str(subset))
+            if prune == 1:
                 break
-        if prune:
+        if prune == 1:
             continue
         else :
             pruned_fkm.append(j_set)
-#    print(pruned_fkm)
     for p_set in pruned_fkm:
         cand_k[p_set] = 0
 
@@ -147,13 +148,10 @@ while k < total_trans and len(freq[k - 2]) != 0:
 
     cand.append(cand_k)
     freq.append(freq_k)
-#    print(cand_k)
-#    print(freq_k)
     k += 1
 
-# check freq list
-for f in freq:
-    print(f)
+# since last frequent set is empty set (while terminology condition)
+freq.pop(len(freq)-1)
 
 
 # make association rule
