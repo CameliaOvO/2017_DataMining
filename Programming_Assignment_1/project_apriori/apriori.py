@@ -25,6 +25,25 @@ def str_to_list(str_list):
     return new_list
 
 
+#make subset of itemset
+def jin_subset(item_set):
+    result_set = [[]]
+    for x in item_set:
+        result_set.extend([y + [x] for y in result_set])
+    result_set.pop(0)
+    result_set.pop(len(result_set)-1)
+
+    return result_set
+
+#return 1 if set1 and set2 is same, return 0 other case
+def set_comp(set1, set2):
+    result = 0
+    if len(set(set1).difference(set(set2))) == 0:
+        if len(set(set2).difference(set(set1))) == 0:
+            result = 1
+    return result
+
+
 # open input data file and store in transaction list
 with open(input_file) as f:
     input_data = f.readlines()
@@ -89,12 +108,28 @@ while k < total_trans and len(freq[k - 2]) != 0:
                 else:
                     continue
 
-                # TODO : Pruning !!
-                # pruning step
-                # check its subset in freq_km, freq_kmm ...
-
+    # pruning step
+    # check its subset in freq_km, freq_kmm ...
+    #make each joined_fkm's non-empty subset
+    pruned_fkm = []
     for j_set in joined_fkm:
-        cand_k[j_set] = 0
+        subs_fkm = jin_subset(str_to_list(j_set))
+        for subset in subs_fkm:
+            prune = 1
+            for fset in freq:
+                for key_fset , val_fset in fset.items():
+                    if set_comp(str_to_list(key_fset), subset) == 1:
+                        prune = 0
+            if prune:
+#                print("I should be pruned and I am "+ list_to_str(subset))
+                break
+        if prune:
+            continue
+        else :
+            pruned_fkm.append(j_set)
+#    print(pruned_fkm)
+    for p_set in pruned_fkm:
+        cand_k[p_set] = 0
 
     # for each transactions
     # increment the count of each candidate in C_k which are contained in t
@@ -112,6 +147,8 @@ while k < total_trans and len(freq[k - 2]) != 0:
 
     cand.append(cand_k)
     freq.append(freq_k)
+#    print(cand_k)
+#    print(freq_k)
     k += 1
 
 # check freq list
