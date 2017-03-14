@@ -3,6 +3,7 @@
 
 
 # TODO : change minsup and filenames raw string to parameter
+# TODO : change output stdout to output_file
 minsup_param = 5
 input_file = "../input.txt"
 output_file = "output.txt"
@@ -34,6 +35,9 @@ def jin_subset(item_set):
     result_set.pop(0)
     # this is not proper-subset
     result_set.pop(len(result_set)-1)
+    for it in result_set:
+        it.sort()
+
     return result_set
 
 
@@ -155,3 +159,33 @@ freq.pop(len(freq)-1)
 
 
 # make association rule
+
+# decompose freq(list of list of dictionary -> list of itemset list)
+# except 1-frequent itemset
+
+decomp_freq_dic = {}
+decomp_freq = []
+for fset in freq:
+    for key, value in fset.items():
+        if len(str_to_list(key)) > 1:
+            decomp_freq.append(str_to_list(key))
+        decomp_freq_dic[key] = value
+
+
+for fset in decomp_freq:
+    set_size = len(fset)
+    all_subset = jin_subset(fset)
+    for subset in all_subset:
+        lhs = subset
+        rhs = list(set(fset).difference(set(lhs)))
+        rhs.sort()
+
+        s = decomp_freq_dic[list_to_str(fset)] / total_trans
+        c = (decomp_freq_dic[list_to_str(fset)] / total_trans) / (decomp_freq_dic[list_to_str(list(lhs))] / total_trans)
+        s *= 100
+        c *= 100
+        print(list_to_str(list(lhs)) + "\t" + list_to_str(list(rhs)) + "\t" + str(round(s, 2)) + "\t" + str(round(c, 2)))
+
+
+
+
