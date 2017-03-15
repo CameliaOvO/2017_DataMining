@@ -3,7 +3,6 @@
 
 
 # TODO : change minsup and filenames raw string to parameter
-# TODO : change output stdout to output_file
 minsup_param = 5
 input_file = "../input.txt"
 output_file = "output.txt"
@@ -157,6 +156,7 @@ while k <= total_trans and len(freq[k - 2]) != 0:
 # since last frequent set is empty set (while terminology condition)
 freq.pop(len(freq)-1)
 
+out_f = open(output_file, "w")
 
 # make association rule
 
@@ -184,7 +184,7 @@ for fset in decomp_freq:
         c = (decomp_freq_dic[list_to_str(fset)] / total_trans) / (decomp_freq_dic[list_to_str(list(lhs))] / total_trans)
         s *= 100
         c *= 100
-        print(list_to_str(list(lhs)) + "\t" + list_to_str(list(rhs)) + "\t" + str(round(s, 2)) + "\t" + str(round(c, 2)))
+        out_f.write(list_to_str(list(lhs)) + "\t" + list_to_str(list(rhs)) + "\t" + str(round(s, 2)) + "\t" + str(round(c, 2))+"\n")
 
 
 
