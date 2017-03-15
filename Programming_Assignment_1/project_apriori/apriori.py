@@ -1,11 +1,11 @@
 # Data Science Programming Assignment 1 : apriori algorithm
 # author : Seonha Park
 
+import sys
 
-# TODO : change minsup and filenames raw string to parameter
-minsup_param = 5
-input_file = "../input.txt"
-output_file = "output.txt"
+minsup_param = int(sys.argv[1])
+input_file = sys.argv[2]
+output_file = sys.argv[3]
 minsup = minsup_param / 100
 
 
@@ -171,6 +171,7 @@ for fset in freq:
             decomp_freq.append(str_to_list(key))
         decomp_freq_dic[key] = value
 
+print (decomp_freq)
 
 for fset in decomp_freq:
     set_size = len(fset)
