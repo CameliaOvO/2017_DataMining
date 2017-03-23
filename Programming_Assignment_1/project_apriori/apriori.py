@@ -3,10 +3,15 @@
 
 import sys
 
+#to change raw input to commandline argument
 minsup_param = int(sys.argv[1])
 input_file = sys.argv[2]
 output_file = sys.argv[3]
 minsup = minsup_param / 100
+
+#minsup_param = 4
+#input_file = "../input.txt"
+#output_file = "output.txt"
 
 
 # change item_set between list and string {[item_id],[item_id],...[item_id]}
@@ -48,7 +53,27 @@ def set_comp(set1, set2):
             result = 1
     return result
 
+#change round function because python round is not sa-sa-o-ip
+def new_round(num):
+    new_num = num*1000
+    #if num is 13.255 -> new num is 13255
+    over_num = int(new_num/1000)
+    first_num = int((new_num%1000)/100)
+    second_num = int((new_num%100)/10)
+    third_num = int(new_num%10)
+    upper = 0
+    if third_num >= 5:
+        second_num = second_num + 1
+    if second_num > 9:
+        second_num = second_num - 10
+        first_num = first_num + 1
+    if first_num > 9:
+        first_num = first_num - 10
+        upper = 1
 
+    ret_num = int(over_num) + int(upper) + round(float(first_num/10),1) + round(float(second_num/100),2)
+    ret_num = round(ret_num,2)
+    return ret_num
 
 # open input data file and store in transaction list
 with open(input_file) as f:
@@ -171,7 +196,7 @@ for fset in freq:
             decomp_freq.append(str_to_list(key))
         decomp_freq_dic[key] = value
 
-print (decomp_freq)
+#print (decomp_freq)
 
 for fset in decomp_freq:
     set_size = len(fset)
@@ -185,8 +210,4 @@ for fset in decomp_freq:
         c = (decomp_freq_dic[list_to_str(fset)] / total_trans) / (decomp_freq_dic[list_to_str(list(lhs))] / total_trans)
         s *= 100
         c *= 100
-        out_f.write(list_to_str(list(lhs)) + "\t" + list_to_str(list(rhs)) + "\t" + str(round(s, 2)) + "\t" + str(round(c, 2))+"\n")
-
-
-
-
+        out_f.write(list_to_str(list(lhs)) + "\t" + list_to_str(list(rhs)) + "\t" + str(new_round(s)) + "\t" + str(new_round(c))+"\r\n")
