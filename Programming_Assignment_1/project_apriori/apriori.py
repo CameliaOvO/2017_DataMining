@@ -1,18 +1,15 @@
 # Data Science Programming Assignment 1 : apriori algorithm
 # author : Seonha Park
+# written in Python3
 
 import sys
 
-#to change raw input to commandline argument
+#to change raw input to command line argument
 minsup_param = int(sys.argv[1])
 input_file = sys.argv[2]
 output_file = sys.argv[3]
+
 minsup = minsup_param / 100
-
-#minsup_param = 4
-#input_file = "../input.txt"
-#output_file = "output.txt"
-
 
 # change item_set between list and string {[item_id],[item_id],...[item_id]}
 def list_to_str(item_set):
@@ -41,7 +38,6 @@ def jin_subset(item_set):
     result_set.pop(len(result_set)-1)
     for it in result_set:
         it.sort()
-
     return result_set
 
 
@@ -74,6 +70,7 @@ def new_round(num):
     ret_num = int(over_num) + int(upper) + round(float(first_num/10),1) + round(float(second_num/100),2)
     ret_num = round(ret_num,2)
     return ret_num
+
 
 # open input data file and store in transaction list
 with open(input_file) as f:
@@ -168,7 +165,7 @@ while k <= total_trans and len(freq[k - 2]) != 0:
             if len(list(set(cand_list).difference(set(transact)))) == 0:
                 cand_k[candidate] += 1
 
-            # make freq_k(L_k) in cand_k(C_k) with minsup
+    # make freq_k(L_k) in cand_k(C_k) with minsup
     freq_k = {}
     for candidate, value in cand_k.items():
         if cand_k[candidate] / total_trans >= minsup:
@@ -181,7 +178,9 @@ while k <= total_trans and len(freq[k - 2]) != 0:
 # since last frequent set is empty set (while terminology condition)
 freq.pop(len(freq)-1)
 
+
 out_f = open(output_file, "w")
+
 
 # make association rule
 
@@ -196,8 +195,7 @@ for fset in freq:
             decomp_freq.append(str_to_list(key))
         decomp_freq_dic[key] = value
 
-#print (decomp_freq)
-
+#make association rules with each subset and write in output file
 for fset in decomp_freq:
     set_size = len(fset)
     all_subset = jin_subset(fset)
@@ -210,4 +208,4 @@ for fset in decomp_freq:
         c = (decomp_freq_dic[list_to_str(fset)] / total_trans) / (decomp_freq_dic[list_to_str(list(lhs))] / total_trans)
         s *= 100
         c *= 100
-        out_f.write(list_to_str(list(lhs)) + "\t" + list_to_str(list(rhs)) + "\t" + str(new_round(s)) + "\t" + str(new_round(c))+"\r\n")
+        out_f.write(list_to_str(list(lhs)) + "\t" + list_to_str(list(rhs)) + "\t" + str(new_round(s)) + "\t" + str(new_round(c))+"\n")
