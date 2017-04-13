@@ -3,10 +3,16 @@
 # written in Python3
 
 import sys
+import math
+
 
 # TODO: implement attribute selection method(D, attr_list) in 3 ways
-def attr_selection(D, attribute_list):
+def attr_selection(D, attribute_list,total_attr):
     attr_name = ""
+    #using gain ratio
+
+    #using Gini index
+
     return attr_name
 
 
@@ -18,8 +24,8 @@ def attr_selection(D, attribute_list):
 # output_file = sys.argv[3]
 
 # erase after finish dt
-train_file = "data/dt_train1.txt"
-test_file = "data/dt_test1.txt"
+train_file = "data/dt_train.txt"
+test_file = "data/dt_test.txt"
 output_file = "data/dt_result.txt"
 
 # get train file and make list of columens
@@ -54,5 +60,28 @@ for i in range(len(attribute_name)):
 for k, v in data_partition.items():
     print(k),
     print(v)
+
+"""
+Make Decision Tree
+input : Data partition  D (data_partition)
+        set of candidate attributes attr_list (attribute_list)
+        Attribute Selection Method (attr_selection)
+
+output : A tree
+
+node {
+        is leaf
+        classification
+
+    }
+
+
+"""
+
+
+
+
+
+
 
 
