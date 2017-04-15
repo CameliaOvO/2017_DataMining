@@ -5,6 +5,69 @@
 import sys
 import math
 
+class Tree(object):
+    def __init__(self, name = 'root'):
+        self.name = ""
+        self.childs = []
+
+
+# implement gain ratio
+def GainRatio(D, attribute_name, total_attr):
+    attr_name = ""
+
+    #info(D) 구하기
+    info_dic = D[attribute_name[len(attribute_name)-1]]
+    info_val_list = []
+    for k, v in info_dic.items():
+        if k in v:
+            info_val_list.append(v[k])
+
+    info_d = 0.0
+    for i in info_val_list:
+        info_d -= (float(i)/float(total_attr)) * math.log2((float(i)/float(total_attr)))
+    print(info_d)
+
+    del D[attribute_name[len(attribute_name)-1]]
+
+
+    gain_list = {}
+    for k,v in D.items():
+        calc_info = 0.0
+        for k1, v1 in v.items():
+            total_in_class = 0
+            list_in_class = []
+            for k2, v2 in v1.items():
+                list_in_class.append(v2)
+                total_in_class += v2
+            for num in list_in_class:
+                info_dj = (float(num)/float(total_in_class)) * math.log2(float(num)/float(total_in_class))
+                calc_info -= float(total_in_class)/float(total_attr) * info_dj
+        gain_list[k] = info_d - calc_info
+
+    split_info = {}
+    for k, v in D.items():
+        calc_info = 0.0
+        list_in_class = []
+        for k1, v1 in v.items():
+            total_in_class = 0
+            for k2, v2 in v1.items():
+                total_in_class += v2
+            list_in_class.append(total_in_class)
+        for num in list_in_class:
+            calc_info -= (float(num)/float(total_attr)) * math.log2(float(num)/float(total_attr))
+        split_info[k] = calc_info
+
+    gain_ratio = {}
+    for k, v in gain_list.items():
+        for k1, v1 in split_info.items():
+            if k == k1 :
+                gain_ratio[k] = v / v1
+    print (gain_ratio)
+
+    attr_name = max(gain_ratio, key=gain_ratio.get)
+
+    return attr_name
+
 
 
 # TODO: Implement Gini Index
@@ -66,8 +129,8 @@ def gini_selection(D, attribute_name, attribute_list,total_attr):
 # output_file = sys.argv[3]
 
 # erase after finish dt
-train_file = "data/dt_train1.txt"
-test_file = "data/dt_test1.txt"
+train_file = "data/dt_train.txt"
+test_file = "data/dt_test.txt"
 output_file = "data/dt_result.txt"
 
 # get train file and make list of columens
@@ -113,42 +176,31 @@ for i in range(len(attribute_name)):
             else :
                 ith_attr[attr[i]][attr[len(attribute_name) - 1]] += 1
 
-    for k,v in ith_attr.items():
-        for label in class_label:
-            if label not in v:
+#    for k,v in ith_attr.items():
+#        for label in class_label:
+#            if label not in v:
 #               print(label + " is not in " + k)
-                v[label] = 0
+#                v[label] = 0
 
 
     data_partition[attribute_name[i]] = ith_attr
 
 
-#for k, v in data_partition.items():
-#    print(k),
-#    print(v)
+for k, v in data_partition.items():
+    print(k),
+    print(v)
 
 
 #gini_selection(data_partition,attribute_name,attribute_list,total_attribute)
 
 
-
-"""
-Make Decision Tree
-input : Data partition  D (data_partition)
-        set of candidate attributes attr_list (attribute_list)
-        Attribute Selection Method (attr_selection)
-
-output : A tree
-
-node {
-        is leaf
-        classification
-
-    }
+GainRatio(data_partition,attribute_name,total_attribute)
 
 
-"""
 
+
+def Generate_decision_tree(D, attribute_name, attribute_list, selection_method, total_attr):
+    pass
 
 
 
