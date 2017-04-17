@@ -4,11 +4,12 @@
 import DecisionTree
 import TreeNode
 import random
+import sys
 
 def main():
-    train_file = "data/dt_train.txt"
-    test_file = "data/dt_test.txt"
-    output_file = "data/dt_result.txt"
+    train_file = sys.argv[1]
+    test_file = sys.argv[2]
+    output_file = sys.argv[3]
 
     # get train file and make list of columens
     with open(train_file) as f:
@@ -40,11 +41,8 @@ def main():
     decision_label = attribute_name[len(attribute_name) - 1]
     tree = DecisionTree.GenerateTree(attribute_list, attribute_name)
 
-    print("tree generated")
-
-
-
-    print(tree)
+#    print("tree generated")
+#    print(tree)
 
     with open(test_file) as f:
         test_input = f.readlines()
@@ -83,7 +81,7 @@ def main():
         f.write(result+"\n")
 
     f.close()
-    print(randpick)
+#    print(randpick)
 
 if __name__ == '__main__':
     main()

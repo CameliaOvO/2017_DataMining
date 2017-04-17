@@ -142,10 +142,9 @@ def GenerateTree(attribute_list, attribute_name):
     idx = attribute_name.index(target)
     for attr in attribute_list:
         values.append(attr[idx])
-    default = majorityClass(attribute_name, attribute_list, target)
 
     if not attribute_list or (len(attribute_name) - 1) <= 0:
-        return default
+        return majorityClass(attribute_name, attribute_list, target)
 
     elif values.count(values[0]) == len(values):
         return values[0]
