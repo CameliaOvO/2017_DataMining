@@ -1,3 +1,5 @@
+# Data Science Programming Assignment 2 : decision tree
+# author : Seonha Park
 #written in Python3
 import math
 
@@ -135,6 +137,15 @@ def makeDataPartition(attribute_name, attribute_list):
     return data_partition
 
 
+def getNumOfAnswer(attribute_list):
+    result_dict = {}
+    for attr in attribute_list:
+        if attr[len(attr)-1] not in result_dict:
+            result_dict[attr[len(attr)-1]] = 1
+        else:
+            result_dict[attr[len(attr) - 1]] += 1
+    return result_dict
+
 def GenerateTree(attribute_list, attribute_name):
     target = attribute_name[len(attribute_name)-1]
     attribute_list = attribute_list[:]
@@ -159,6 +170,7 @@ def GenerateTree(attribute_list, attribute_name):
             new_attribute.remove(selected)
 
             child = GenerateTree(all_attribute, new_attribute)
+#            print("child " + value + " generated and total number is " + str(len(all_attribute)))
             tree[selected][value] = child
-
+            tree[selected]["num"] = getNumOfAnswer(attribute_list)
     return tree
