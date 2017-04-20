@@ -79,8 +79,6 @@ def main():
                 ith_class.append(attr[i])
         possible_name[attribute_name[i]] = ith_class
 
-    print(possible_name)
-
     # get decision class's label and generate tree
     decision_label = attribute_name[len(attribute_name) - 1]
     tree = DecisionTree.GenerateTree(attribute_list, attribute_name)
