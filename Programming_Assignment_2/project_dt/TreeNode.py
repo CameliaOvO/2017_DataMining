@@ -1,3 +1,5 @@
+# node of tree
+
 class TreeNode:
     value = ""
     childs = []

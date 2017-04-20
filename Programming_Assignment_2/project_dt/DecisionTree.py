@@ -3,6 +3,7 @@
 #written in Python3
 import math
 
+# follow majority rule to finish tree
 def majorityClass(attributes, data, target):
     freq_value  = {}
     index = attributes.index(target)
@@ -19,10 +20,8 @@ def majorityClass(attributes, data, target):
             major_label = key
     return major_label
 
-
+# calculate gain and splitinfo to get gain ratio
 def GainRatio(D, attribute_name, total_attr):
-    attr_name = ""
-
     #get Info(D)
     info_dic = D[attribute_name[len(attribute_name)-1]]
     info_val_list = []
@@ -38,7 +37,7 @@ def GainRatio(D, attribute_name, total_attr):
             info_d -= 0
     del D[attribute_name[len(attribute_name)-1]]
 
-
+    #calculate gain
     gain_list = {}
     for k,v in D.items():
         calc_info = 0.0
@@ -56,6 +55,7 @@ def GainRatio(D, attribute_name, total_attr):
                 calc_info -= float(total_in_class)/float(total_attr) * info_dj
         gain_list[k] = info_d - calc_info
 
+    # calculate splitInfo
     split_info = {}
     for k, v in D.items():
         calc_info = 0.0
@@ -72,16 +72,19 @@ def GainRatio(D, attribute_name, total_attr):
                 calc_info -= 0
         split_info[k] = calc_info
 
+    # do gain/splitInfo to get gain ratio
     gain_ratio = {}
     for k, v in gain_list.items():
         for k1, v1 in split_info.items():
             if k == k1 :
                 gain_ratio[k] = v / v1
+
+    # return max value in the list of gain ratio
     attr_name = max(gain_ratio, key=gain_ratio.get)
 
     return attr_name
 
-
+# get proper attributes's value in attribute
 def getValues(data, attributes, attribute):
     index = attributes.index(attribute)
     values = []
@@ -90,7 +93,7 @@ def getValues(data, attributes, attribute):
             values.append(entry[index])
     return values
 
-
+# get proper entries in all attribute
 def getEntries(data, attributes, selected, val):
     all_entries = [[]]
     index = attributes.index(selected)
@@ -105,6 +108,7 @@ def getEntries(data, attributes, selected, val):
     return all_entries
 
 
+# make data partition D with all attribute and attribute names to calculate gain ratio
 def makeDataPartition(attribute_name, attribute_list):
     possible_name = {}
     for i in range(len(attribute_name)):
@@ -136,7 +140,7 @@ def makeDataPartition(attribute_name, attribute_list):
         data_partition[attribute_name[i]] = ith_attr
     return data_partition
 
-
+# check all answers in the node
 def getNumOfAnswer(attribute_list):
     result_dict = {}
     for attr in attribute_list:
@@ -146,6 +150,7 @@ def getNumOfAnswer(attribute_list):
             result_dict[attr[len(attr) - 1]] += 1
     return result_dict
 
+# Generate Tree recursively
 def GenerateTree(attribute_list, attribute_name):
     target = attribute_name[len(attribute_name)-1]
     attribute_list = attribute_list[:]
@@ -154,23 +159,27 @@ def GenerateTree(attribute_list, attribute_name):
     for attr in attribute_list:
         values.append(attr[idx])
 
+    # if attribute_list is empty or no choice of attribute name, return majority class
     if not attribute_list or (len(attribute_name) - 1) <= 0:
         return majorityClass(attribute_name, attribute_list, target)
 
+    #if all valaues are in same class
     elif values.count(values[0]) == len(values):
         return values[0]
 
     else :
+        # select attribute using gain ratio and generate tree
         selected = GainRatio(makeDataPartition(attribute_name, attribute_list), attribute_name, len(attribute_list))
         tree = {selected:{}}
+
 
         for value in getValues(attribute_list, attribute_name, selected):
             all_attribute = getEntries(attribute_list, attribute_name, selected, value)
             new_attribute = attribute_name[:]
             new_attribute.remove(selected)
 
+            #generate child tree
             child = GenerateTree(all_attribute, new_attribute)
-#            print("child " + value + " generated and total number is " + str(len(all_attribute)))
             tree[selected][value] = child
             tree[selected]["num"] = getNumOfAnswer(attribute_list)
     return tree
