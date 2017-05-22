@@ -64,15 +64,10 @@ def expandCluster(P,N,visited, C_set,C, dataset, eps,minPts):
 
 def main():
     # get command line argument
-    # input_file = sys.argv[1]
-    # num_of_cluster = sys.argv[2]
-    # eps = sys.argv[3]
-    # minpts = sys.argv[4]
-
-    input_file = "data/input1.txt"
-    num_of_cluster = 8
-    eps = 15
-    minpts = 22
+    input_file = sys.argv[1]
+    num_of_cluster = int(sys.argv[2])
+    eps = int(sys.argv[3])
+    minpts = int(sys.argv[4])
 
     with open(input_file) as f:
         input_data = f.readlines()
@@ -106,7 +101,16 @@ def main():
         cluster_list.pop(to_merge)
         clusters -= 1
 
+    #write output file
+    output_form = (input_file.split("."))[0]+"_cluster_"
+    output_files = []
+    for n in range(num_of_cluster):
+        output_files.append(output_form+str(n)+".txt")
 
+    for o_file in output_files:
+        out_f = open(o_file,"w")
+        for c in cluster_list[output_files.index(o_file)]:
+            out_f.write(str(c[0])+"\n")
 
 if __name__ == '__main__':
     main()
