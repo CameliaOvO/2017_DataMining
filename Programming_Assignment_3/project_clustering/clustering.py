@@ -1,17 +1,24 @@
-# Data Science Programming Assignment 3 : perform clustering
+# Data Science Programming Assignment 3 : perform clustering by using DBSCAN
 # author : Seonha Park
 # written in Python3
 
 import sys
 import math
 
+VISIT = 1
+UNVISIT = 0
+UNCLASSIFIED = 0
+NOISE = -1
+
 # get distance between p[idx1, x1, y1] and q[idx1, x2, y2]
 def dist(p,q):
     return math.sqrt(abs(p[1]-q[1])**2 + abs(p[2]-q[2])**2)
 
+
 # use in regionQuery(P,eps)
 def checkEpsNeighbor(p,q,eps):
     return dist(p,q) < eps
+
 
 # return all points within P's eps-neighborhood (including P)
 def regionQuery(p,all_point,eps):
@@ -21,36 +28,38 @@ def regionQuery(p,all_point,eps):
             returnPts.append(q)
     return returnPts
 
+
+# do DBSCAN algorithm
 def DBSCAN(D, eps, minPts):
-    pass
+    cluster_id = 0
+    visited = [UNVISIT] * len(D)
+    classified = [UNCLASSIFIED] * len(D)
+    for p in D:
+        if visited[p[0]] == UNVISIT:
+            visited[p[0]] = VISIT
+            N = regionQuery(p,D,eps)
+            if len(N) < minPts:
+                classified[p[0]] = NOISE
+            else:
+                cluster_id = cluster_id + 1
+                expandCluster(p, N, visited,classified, cluster_id, D, eps, minPts)
+    return classified
 
-def expandCluster(P,N,C,eps,minPts):
-    pass
 
-"""
-DBSCAN(D, eps, MinPts)
-   C = 0
-   for each unvisited point P in dataset D
-      mark P as visited
-      N = regionQuery(P, eps)
-      if sizeof(N) < MinPts
-         mark P as NOISE
-      else
-         C = next cluster
-         expandCluster(P, N, C, eps, MinPts)
+# expand [cluster_id]th cluster
+def expandCluster(P,N,visited, C_set,C, dataset, eps,minPts):
+    C_set[P[0]] = C
+    while len(N) > 0:
+        P_ = N[0]
+        if visited[P_[0]] == UNVISIT:
+            visited[P_[0]] = VISIT
+            N_ = regionQuery(P_,dataset,eps)
+            if len(N_) >= minPts:
+                N = N + N_
+        if C_set[P_[0]] == UNCLASSIFIED:
+            C_set[P_[0]] = C
+        N.pop(0)
 
-expandCluster(P,N,C,eps,MinPts)
-   add P to cluster C
-   for each point P' in N
-      if P' is not visited
-         mark P' as visited
-         N' = regionQuery(P', eps)
-         if sizeof(N') >= MinPts
-            N = N joined with N'
-      if P' is not yet member of any cluster
-         add P' to cluster C
-
-"""
 
 def main():
     # get command line argument
@@ -70,11 +79,16 @@ def main():
 
     # make train_data string to attribute list and get each attribute name and total number of columns
     object_list = []
-    total_object = 0
     for line in input_data:
         each_line = line.split("\t")
+        each_line[0] = int(each_line[0])
+        each_line[1] = float(each_line[1])
+        each_line[2] = float(each_line[2])
         object_list.append(each_line)
-        total_object += 1
+
+    clustered = DBSCAN(object_list,eps,minpts)
+    print(clustered)
+
 
 
 if __name__ == '__main__':
