@@ -2,6 +2,7 @@
 # author : Seonha Park
 # written in Python3
 
+
 import sys
 import math
 
@@ -87,7 +88,23 @@ def main():
         object_list.append(each_line)
 
     clustered = DBSCAN(object_list,eps,minpts)
-    print(clustered)
+    clusters = max(clustered)
+
+    cluster_list = [[] for x in range(clusters)]
+    for o,c in zip(object_list,clustered):
+        if c > 0:
+            cluster_list[c-1].append(o)
+
+    while num_of_cluster < clusters:
+        size_of_cluster = [0]*clusters
+        for c in range(len(size_of_cluster)):
+            size_of_cluster[c] = len(cluster_list[c])
+        to_merge = size_of_cluster.index(min(size_of_cluster))
+        for p in cluster_list[to_merge]:
+            # how can i merge
+            pass
+        cluster_list.pop(to_merge)
+        clusters -= 1
 
 
 
