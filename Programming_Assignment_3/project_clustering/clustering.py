@@ -59,7 +59,7 @@ def expandCluster(P, N, visited, C_set, C, dataset, eps, minPts):
             N_ = regionQuery(P_, dataset, eps)
             if len(N_) >= minPts:
                 N = N + N_
-        if C_set[P_[0]] == UNCLASSIFIED:
+        if C_set[P_[0]] == UNCLASSIFIED or C_set[P_[0]] == NOISE:
             C_set[P_[0]] = C
         N.pop(0)
 
@@ -94,12 +94,6 @@ def main():
         if c > 0:
             cluster_list[c - 1].append(o)
 
-    # make list of regionQuery result of all point (to reduce execution time)
-    region_list = []
-    for o in object_list:
-        o_eps_neighbor = regionQuery(o,object_list,eps)
-        region_list.append(o_eps_neighbor)
-
     # reduce the number of cluster if it is bigger than that in parameter
     while num_of_cluster < clusters:
         # calculate which cluster to merge (smallest cluster)
@@ -109,7 +103,7 @@ def main():
         to_merge = size_of_cluster.index(min(size_of_cluster))
         # move points to nearest bigger cluster
         for p in cluster_list[to_merge]:
-            neighbors = region_list[p[0]]
+            neighbors = regionQuery(p,object_list,eps)
             distance = sys.maxsize
             for neighbor in neighbors:
                 if dist(p,neighbor) < distance and clustered[p[0]] != clustered[neighbor[0]]:
@@ -120,10 +114,10 @@ def main():
         cluster_list.pop(to_merge)
         clusters -= 1
 
-    # write output file
+    # write clusters in output file
     output_form = (input_file.split("."))[0] + "_cluster_"
     output_files = []
-    for n in range(num_of_cluster):
+    for n in range(clusters):
         output_files.append(output_form + str(n) + ".txt")
 
     for idx in range(len(output_files)):
