@@ -2,7 +2,6 @@
 # author : Seonha Park
 # written in Python3
 
-
 import sys
 import math
 
@@ -11,21 +10,22 @@ UNVISIT = 0
 UNCLASSIFIED = 0
 NOISE = -1
 
+
 # get distance between p[idx1, x1, y1] and q[idx1, x2, y2]
-def dist(p,q):
-    return math.sqrt(abs(p[1]-q[1])**2 + abs(p[2]-q[2])**2)
+def dist(p, q):
+    return math.sqrt(abs(p[1] - q[1]) ** 2 + abs(p[2] - q[2]) ** 2)
 
 
 # use in regionQuery(P,eps)
-def checkEpsNeighbor(p,q,eps):
-    return dist(p,q) < eps
+def checkEpsNeighbor(p, q, eps):
+    return dist(p, q) < eps
 
 
 # return all points within P's eps-neighborhood (including P)
-def regionQuery(p,all_point,eps):
+def regionQuery(p, all_point, eps):
     returnPts = []
     for q in all_point:
-        if checkEpsNeighbor(p,q,eps):
+        if checkEpsNeighbor(p, q, eps):
             returnPts.append(q)
     return returnPts
 
@@ -38,23 +38,23 @@ def DBSCAN(D, eps, minPts):
     for p in D:
         if visited[p[0]] == UNVISIT:
             visited[p[0]] = VISIT
-            N = regionQuery(p,D,eps)
+            N = regionQuery(p, D, eps)
             if len(N) < minPts:
                 classified[p[0]] = NOISE
             else:
                 cluster_id = cluster_id + 1
-                expandCluster(p, N, visited,classified, cluster_id, D, eps, minPts)
+                expandCluster(p, N, visited, classified, cluster_id, D, eps, minPts)
     return classified
 
 
 # expand [cluster_id]th cluster
-def expandCluster(P,N,visited, C_set,C, dataset, eps,minPts):
+def expandCluster(P, N, visited, C_set, C, dataset, eps, minPts):
     C_set[P[0]] = C
     while len(N) > 0:
         P_ = N[0]
         if visited[P_[0]] == UNVISIT:
             visited[P_[0]] = VISIT
-            N_ = regionQuery(P_,dataset,eps)
+            N_ = regionQuery(P_, dataset, eps)
             if len(N_) >= minPts:
                 N = N + N_
         if C_set[P_[0]] == UNCLASSIFIED:
@@ -82,35 +82,58 @@ def main():
         each_line[2] = float(each_line[2])
         object_list.append(each_line)
 
-    clustered = DBSCAN(object_list,eps,minpts)
+
+    clustered = DBSCAN(object_list, eps, minpts)
     clusters = max(clustered)
 
     cluster_list = [[] for x in range(clusters)]
-    for o,c in zip(object_list,clustered):
+    for o, c in zip(object_list, clustered):
         if c > 0:
-            cluster_list[c-1].append(o)
+            cluster_list[c - 1].append(o)
+
+
+    region_list = []
+    for o in object_list:
+        o_eps_neighbor = regionQuery(o,object_list,eps)
+        region_list.append(o_eps_neighbor)
 
     while num_of_cluster < clusters:
-        size_of_cluster = [0]*clusters
+        size_of_cluster = [0] * clusters
         for c in range(len(size_of_cluster)):
             size_of_cluster[c] = len(cluster_list[c])
         to_merge = size_of_cluster.index(min(size_of_cluster))
+        print(size_of_cluster)
+        print("to merge : "+ str(to_merge))
+#        print(cluster_list[to_merge])
         for p in cluster_list[to_merge]:
-            # how can i merge
-            pass
+#            neighbors = regionQuery(p,object_list,eps)
+            neighbors = region_list[p[0]]
+#            print(neighbors)
+            distance = sys.maxsize
+            for neighbor in neighbors:
+                if dist(p,neighbor) < distance and clustered[p[0]] != clustered[neighbor[0]]:
+                    distance = dist(p,neighbor)
+                    nearest = neighbor
+#                    print("nearest changed")
+            cluster_list[clustered[nearest[0]]-1].append(p)
+            clustered[p[0]] = clustered[nearest[0]]
+#            print("p moved to other cluster")
         cluster_list.pop(to_merge)
         clusters -= 1
 
-    #write output file
-    output_form = (input_file.split("."))[0]+"_cluster_"
+    # write output file
+    output_form = (input_file.split("."))[0] + "_cluster_"
     output_files = []
     for n in range(num_of_cluster):
-        output_files.append(output_form+str(n)+".txt")
+        output_files.append(output_form + str(n) + ".txt")
 
-    for o_file in output_files:
-        out_f = open(o_file,"w")
-        for c in cluster_list[output_files.index(o_file)]:
-            out_f.write(str(c[0])+"\n")
+    for idx in range(len(output_files)):
+        out_f = open(output_files[idx], "w")
+        cluster_list[idx].sort()
+        to_write = cluster_list[idx]
+        for c in to_write:
+            out_f.write(str(c[0]) + "\n")
+
 
 if __name__ == '__main__':
     main()
