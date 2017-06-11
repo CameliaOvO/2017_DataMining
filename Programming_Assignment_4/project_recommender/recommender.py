@@ -4,7 +4,6 @@
 
 import sys
 import math
-import time
 
 def get_sim(user1, user2, intersected, record_list):
     mean_user1 = 0.0
@@ -77,14 +76,8 @@ def predict(user, item, record_list, user_item, get_intersect,average_common, us
 
 def main():
     # get command line argument
-#    train_file = sys.argv[1]
-#    test_file = sys.argv[2]
-
-    start_time = time.time()
-
-
-    train_file = "data/u5.base"
-    test_file = "data/u5.test"
+    train_file = sys.argv[1]
+    test_file = sys.argv[2]
 
     with open(train_file) as f:
         train_data = f.readlines()
@@ -166,10 +159,6 @@ def main():
         each_line = line.split("\t")
         temp_tuple = (int(each_line[0]), int(each_line[1]))
         test_list.append(temp_tuple)
-
-    end_time = time.time()
-
-    print("execution time : " + str(end_time - start_time) )
 
 
     output_file = train_file+"_prediction.txt"
